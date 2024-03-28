@@ -7,9 +7,6 @@ import java.util.*;
 public class Lexer {
     private ArrayList<Token> tokensList = new ArrayList<>();
     private boolean isInMultiLineComment = false;
-
-    public ArrayList<String> lines = new ArrayList<>();
-
     private static String[] TOKEN_REGEX = {
             // NOTE: Keyword higher priority
             "^begin$", "BEGIN",
@@ -74,26 +71,27 @@ public class Lexer {
     public void tokenize(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
+            int lineIndex = 1;
             while ((line = br.readLine()) != null) {
-                lines.add(line);
                 line= removeSingleLineComment(line);
                 line = removeMultiLineComment(line);
                 if (!line.trim().isEmpty()) {
                     String convertedLine = convertCode(line);
-                    tokenizeLine(convertedLine);
+                    tokenizeLine(convertedLine, lineIndex);
                 }
+                lineIndex++;
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void tokenizeLine(String line) {
+    public void tokenizeLine(String line, int lineIndex) {
         Matcher matcher = Pattern.compile("\\S+").matcher(line.trim());
         while (matcher.find()) {
-            String token = matcher.group();
-            String tokenType = matched(token);
-            tokensList.add(new Token(token, tokenType));
+            String tokenValue = matcher.group();
+            String tokenType = matched(tokenValue);
+            tokensList.add(new Token(tokenValue, tokenType, lineIndex));
         }
     }
 
@@ -123,9 +121,5 @@ public class Lexer {
 
     public ArrayList<Token> getTokensList() {
         return tokensList;
-    }
-
-    public ArrayList<String> getLines() {
-        return lines;
     }
 }

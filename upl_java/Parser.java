@@ -5,30 +5,15 @@ import java.util.HashSet;
 
 public class Parser {
     private ArrayList<Token> tokens;
-    private HashSet<String> localMemory;
-    private HashSet<String> globalMemory;
-    private ArrayList<String> lines;
+    private HashSet<String> localVariable;
+    private HashSet<String> globalVariable;
     private int index;
 
-    public Parser(ArrayList<Token> tokens, Lexer lexer) {
+    public Parser(ArrayList<Token> tokens) {
         this.tokens = tokens;
         this.index = 0;
-        localMemory = new HashSet<>();
-        globalMemory = new HashSet<>();
-        this.lines = lexer.getLines();
-    }
-
-    public static void main(String[] args) {
-        Lexer lexer = new Lexer();
-        lexer.tokenize("C:\\\\Users\\\\PC\\\\Downloads\\\\Lexical_Analysis\\\\src\\\\main.upl");
-
-        // Tạo một đối tượng Parser và truyền vào lexer
-        Parser parser = new Parser(null, lexer);
-
-        // In ra các dòng từ Lexer
-        for (String line : parser.lines) {
-            System.out.println(line);
-        }
+        localVariable = new HashSet<>();
+        globalVariable = new HashSet<>();
     }
 
     public void parse() {
@@ -44,8 +29,18 @@ public class Parser {
     }
 
     public void match(String token) {
-        if (index < tokens.size() && !nextToken(token)) {
-            System.out.println("Invalid");
+        if (index == 0 && !nextToken(token)) {
+            System.out.println("Error: Missing 'BEGIN' keyword to start the program ");
+            index = tokens.size();
+        }
+
+        if (index == tokens.size() && token.equals("END")) {
+            System.out.println("Error: Missing 'END' keyword to end the program ");
+        }
+
+        if (index > 0 && index < tokens.size() && !nextToken(token)) {
+            System.out.println("Error: Unexpected token '" + tokens.get(index - 1).getValue() + "'" + " at line: "
+                    + tokens.get(index - 1).getLineIndex());
         }
 
         index++;
@@ -75,7 +70,8 @@ public class Parser {
         } else if (nextToken("PRINT")) {
             printStatement();
         } else if (nextToken("UNKNOWN")) {
-            System.out.println("Error: Unknown token found '" + tokens.get(index).getValue() + "'");
+            System.out.println("Error: Unknown token found '" + tokens.get(index).getValue() + "'" + " at line: "
+                    + tokens.get(index).getLineIndex());
             index++;
         } else {
             index++;
@@ -85,12 +81,14 @@ public class Parser {
     public void declaration() {
         Type();
         String identifier = tokens.get(index).getValue();
-        if (localMemory.contains(identifier)) {
+        if (localVariable.contains(identifier)) {
             System.out
-                    .println("Error: Identifier '" + identifier + "' has already been declared in the current scope.");
+                    .println("Error: Identifier '" + identifier
+                            + "' has already been declared in the current scope at line: "
+                            + tokens.get(index).getLineIndex());
         } else {
-            localMemory.add(identifier);
-            globalMemory.add(identifier);
+            localVariable.add(identifier);
+            globalVariable.add(identifier);
         }
         match("IDENTIFIER");
         if (nextToken("ASSIGN")) {
@@ -156,7 +154,7 @@ public class Parser {
 
     public void expression() {
         term();
-        while (index < tokens.size() && nextToken("ADD") || nextToken("MULTIPLY")) {
+        while (index < tokens.size() && (nextToken("ADD") || nextToken("MULTIPLY"))) {
             if (nextToken("ADD")) {
                 match("ADD");
                 term();
@@ -191,8 +189,9 @@ public class Parser {
 
     public void factor() {
         if (nextToken("IDENTIFIER")) {
-            if (!globalMemory.contains(tokens.get(index).getValue())) {
-                System.out.println("Error: Identifier '" + tokens.get(index).getValue() + "' is not declared.");
+            if (!globalVariable.contains(tokens.get(index).getValue())) {
+                System.out.println("Error: Identifier '" + tokens.get(index).getValue() + "' is not declared at line: "
+                        + tokens.get(index).getLineIndex());
             }
             match("IDENTIFIER");
         } else if (nextToken("INTEGER CONSTANT")) {
