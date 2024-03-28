@@ -1,6 +1,14 @@
-## 1. Văn phạm phi ngữ cảnh
+# 1. Thành viên nhóm
 
-### 1. Ký hiệu
+| STT | Họ và tên | Mã sinh viên |
+| :--: | :--: | :--: |
+| 1 | Cung Văn Thắng | 21020939 |
+| 2 | Phạm Tuấn Anh | 20020631 |
+| 3 | Lê Ngọc Ánh | 20020166 |
+
+# 2. Văn phạm phi ngữ cảnh
+
+## 2.1. Ký hiệu
 
 - `S`: Biểu tượng bắt đầu (start symbol)
 - `<stmtList>`: Danh sách các câu lệnh
@@ -17,7 +25,7 @@
 - `<MulOp>`: Toán tử nhân chia
 - `T`: Tập hợp các ký hiệu (token)
 
-### 2. Cấu trúc
+## 2.2. Cấu trúc
 
 - Cấu trúc chương trình: `begin <stmtList> end`
 - Danh sách câu lệnh: có thể rỗng hoặc gồm nhiều câu lệnh nối tiếp nhau bằng dấu chấm phẩy `;`
@@ -44,7 +52,7 @@
     - `integer`: Số nguyên
     - `(" <Expr> ")`: Biểu thức trong ngoặc
 
-### 3. Văn phạm phi ngữ cảnh
+## 2.3. Văn phạm phi ngữ cảnh
 
 ```
 S -> begin <stmtList> end
@@ -90,3 +98,96 @@ T = {identifier}, {keyword}, {integer}, {boolean}, {operator}, "do", "while", "i
 {operator} = "+" | "-" | "*" | "/" | "<" | ">" | "<=" | ">=" | "==" | "!="
 
 ```
+
+# 3. Xây dựng bộ phân tích từ vựng 
+## 3.1. Viết từ đầu
+### 3.1.1. Phân tích từ vựng
+
+**Cách chạy chương trình:**
+
+**Bước 1:** Thay đổi đường dẫn file path `main.upl`
+
+![image](https://github.com/CUNGVANTHANG/BAITAP_NHOM/assets/96326479/bf6de091-a3a6-42ec-911c-5bbf59de926f)
+
+**Bước 2:** Chạy chương trình `Run`
+
+
+- **Test case 1:**
+
+```
+begin
+	int isTrue123;
+	print(a);
+	do {
+		if x > a then {
+			a = b;
+		}
+	} while(isTrue123)
+end
+```
+
+_Kết quả:_
+
+![image](https://github.com/CUNGVANTHANG/BAITAP_NHOM/assets/96326479/dd159780-c74a-44a6-ab1c-b479e73771c3)
+
+- **Test case 2:**
+
+```
+begin
+	int x;
+	int y=x+1;
+
+    	bool a;
+	if x>a then{
+		int c=1;
+	}else{
+		y=x;
+		x=x+1;
+	}
+end
+```
+
+_Kết quả:_
+
+![image](https://github.com/CUNGVANTHANG/BAITAP_NHOM/assets/96326479/f865bd86-325c-4f67-b5eb-ae4f333bea6b)
+
+- **Test case 3:**
+
+```
+begin
+	int x;
+	int y=x+1;
+	/*	comments
+	cho nhiều dòng
+	*/
+	
+	bool a;//comment cho một dòng
+	if x>a then{
+		int c=1;
+	}else{
+		y=x;
+		x=x+1;
+	}
+	print(a);
+	if x>=a then{
+	x=x+1;
+}
+	bool x=a==b;
+	do{
+		int b=1;
+		b=b*10;
+		a=(b+10)*b;
+	}while(a>1);
+	print(a+1);
+end
+```
+
+_Kết quả:_
+
+![image](https://github.com/CUNGVANTHANG/BAITAP_NHOM/assets/96326479/ef82002a-5c53-41ad-a023-f5bcc4a2eff0)
+
+## 3.1.3. Phân tích cú pháp
+
+
+
+## 3.2. Sử dụng công cụ JFlex
