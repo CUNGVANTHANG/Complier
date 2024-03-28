@@ -1,4 +1,12 @@
-## 1. Văn phạm phi ngữ cảnh
+## 1. Thành viên nhóm
+
+| STT | Họ và tên | Mã sinh viên |
+| :--: | :--: | :--: |
+| 1 | Cung Văn Thắng | 21020939 |
+| 2 | Phạm Tuấn Anh | 20020631 |
+| 3 | Lê Ngọc Ánh | 20020166 |
+
+## 2. Văn phạm phi ngữ cảnh
 
 ### 1. Ký hiệu
 
@@ -90,3 +98,32 @@ T = {identifier}, {keyword}, {integer}, {boolean}, {operator}, "do", "while", "i
 {operator} = "+" | "-" | "*" | "/" | "<" | ">" | "<=" | ">=" | "==" | "!="
 
 ```
+
+## 3. Xây dựng bộ phân tích từ vựng 
+### 1. Viết từ đầu
+
+- **Test case 1: Phân tích từ vựng**
+
+```
+begin
+	int x;
+	int y=x+1;
+
+    bool a;
+	if x>a then{
+		int c=1;
+	}else{
+		y=x;
+		x=x+1;
+	}
+end
+```
+
+![image](https://github.com/CUNGVANTHANG/BAITAP_NHOM/assets/96326479/205dc43e-a6b2-46e3-9f40-9154f48e51e1)
+
+![image](https://github.com/CUNGVANTHANG/BAITAP_NHOM/assets/96326479/d4344cb5-ac13-4b63-bfcb-80c0427523c4)
+
+
+
+
+### 2. Sử dụng công cụ JFlex
