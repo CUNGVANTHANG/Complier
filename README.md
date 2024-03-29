@@ -8,95 +8,50 @@
 
 # 2. Văn phạm phi ngữ cảnh
 
-## 2.1. Ký hiệu
-
-- `S`: Biểu tượng bắt đầu (start symbol)
-- `<stmtList>`: Danh sách các câu lệnh
-- `<stmt>`: Câu lệnh
-- `<Type>`: Kiểu dữ liệu
-- `<Declaration>`: Khai báo biến
-- `<Assignment>`: Gán giá trị cho biến
-- `<Expr>`: Biểu thức
-- `<Term>`: Hạng tử
-- `<Factor>`: Nhân tử
-- `<Primary>`: Đơn vị cơ bản
-- `<RelOp>`: Toán tử quan hệ
-- `<AddOp>`: Toán tử cộng trừ
-- `<MulOp>`: Toán tử nhân chia
-- `T`: Tập hợp các ký hiệu (token)
-
-## 2.2. Cấu trúc
-
-- Cấu trúc chương trình: `begin <stmtList> end`
-- Danh sách câu lệnh: có thể rỗng hoặc gồm nhiều câu lệnh nối tiếp nhau bằng dấu chấm phẩy `;`
-- Câu lệnh:
-    - `if <Expr> then { <stmtList> }`: Câu lệnh điều kiện if-then
-    - `if <Expr> then { <stmtList> } else { <stmtList> }`: Câu lệnh điều kiện if-then-else
-    - `do { <stmtList> } while (<Expr>)`: Vòng lặp do-while
-    - `<Assignment>`: Gán giá trị cho biến
-    - `<Declaration>`: Khai báo biến
-    - `print "(" <Expr> ")"`: In ra giá trị của biểu thức
-- Khai báo biến: `<Type> <identifier>`
-- Gán giá trị: `<identifier> = <Expr>`
-- Biểu thức:
-    - `<Term> <RelOp> <Term>`: Biểu thức so sánh
-    - `<Term>`: Biểu thức toán học
-- Hạng tử:
-    - `<Factor> <AddOp> <Term>`: Biểu thức toán học
-    - `<Factor>`: Nhân tử
-- Nhân tử:
-    - `<Primary> <MulOp> <Factor>`: Biểu thức toán học
-    - `<Primary>`: Đơn vị cơ bản
-- Đơn vị cơ bản:
-    - `identifier`: Biến
-    - `integer`: Số nguyên
-    - `(" <Expr> ")`: Biểu thức trong ngoặc
-
-## 2.3. Văn phạm phi ngữ cảnh
-
 ```
-S -> begin <stmtList> end
+Program          -> 'begin' StatementList 'end'
 
-T = {identifier}, {keyword}, {integer}, {boolean}, {operator}, "do", "while", "if", "then", "else", "print"
+StatementList    -> Statement ';' StatementList
+                  | Statement ';'
 
-<stmtList> -> epsilon | <stmt> ; <stmtList>
+Statement        -> Declaration
+                  | Assignment
+                  | ConditionalStatement
+                  | LoopStatement
+                  | PrintStatement
 
-<stmt> ->
-  "if" <Expr> "then" { <stmtList> }
-  | "if" <Expr> "then" { <stmtList> } "else" { <stmtList> }
-  | "do" { <stmtList> } "while" "(" <Expr> ")"
-  | <Assignment>
-  | <Declaration>
-  | "print" "(" <Expr> ")"
+Declaration      -> Type Identifier | Type Identifier '=' Expression
 
-<Type> -> "int" | "bool"
+Type             -> 'int' | 'bool'
 
-<Declaration> -> <Type> <identifier> 
+Identifier       -> Letter Letter*Digit
 
-<Assignment> -> <identifier> = <Expr>  
+Assignment       -> Identifier '=' Expression
 
-<Expr> -> <Term> <RelOp> <Term> | <Term>  
+Expression       -> Term
+                  | Expression '+' Term
+                  | Expression ROP Term
 
-<RelOp> -> "<" | ">" | "<=" | ">=" | "==" | "!="
+Term             -> Factor
+                  | Term '*' Factor
 
-<Term> -> <Factor> <AddOp> <Term> | <Factor>
+Factor           -> Identifier
+                  | Number
+                  | '(' Expression ')'
 
-<AddOp> -> "+" | "-"
+Number           -> Digit+
 
-<Factor> -> <Primary> <MulOp> <Factor> | <Primary>
+ConditionalStatement -> 'if' Expression 'then' '{' Statement '}' | 'if' Expression 'then' '{' Statement '}' 'else' '{' Statement '}'
 
-<MulOp> -> "*" | "/"
+LoopStatement    -> 'do' '{' Statement '}' while' Expression
 
-<Primary> -> <identifier> | <integer> | "(" <Expr> ")"
+PrintStatement   -> 'print' '(' Expression ')'
 
-{identifier} -> ^[a-zA-Z]+[0-9]*  
+Letter           -> 'a' | 'b' | ... | 'z' | 'A' | 'B' | ... | 'Z'
 
-{integer} -> [0-9]+               
+Digit            -> '0' | '1' | ... | '9'
 
-{keyword} = "do" | "while" | "if" | "then" | "else" | "print"
-
-{operator} = "+" | "-" | "*" | "/" | "<" | ">" | "<=" | ">=" | "==" | "!="
-
+ROP              -> '>' | '>=' | '=='
 ```
 
 # 3. Xây dựng bộ phân tích từ vựng 
