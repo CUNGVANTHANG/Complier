@@ -212,7 +212,7 @@ Khi chạy trình quét trên một tệp nguồn UPL như **`example.upl`**, b�
 - **Các token khác**: Số nguyên, các toán tử (**`=`**, **`>=`**, **`>`**, **`<=`**, **`<`**, **`==`**, **`+`**, **``**), dấu chấm phẩy, dấu ngoặc đơn, dấu ngoặc nhọn, dấu bằng.
 - **Các lỗi**: Nếu có ký tự không hợp lệ trong mã nguồn UPL, chương trình sẽ xuất ra thông báo lỗi và vị trí của nó.
 
-## 3.2. Phân tích cú pháp
+## 3.2. Thông báo lỗi
 
 **Bước 1:** Thay đổi đường dẫn file path `main.upl`
 
