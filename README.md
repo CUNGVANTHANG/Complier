@@ -28,9 +28,7 @@ Identifier       -> Letter Letter*Digit
 
 Assignment       -> Identifier '=' Expression
 
-Expression       -> Term
-                  | Expression '+' Term
-                  | Expression ROP Term
+Expression       -> Term | Expression '+' Term | Expression ROP Term
 
 Term             -> Factor
                   | Term '*' Factor

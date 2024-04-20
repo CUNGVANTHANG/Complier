@@ -3,7 +3,7 @@ package main;
 public class Main {
     public static void main(String[] args) {
         // File Path
-        String filePath = "C:\\Users\\PC\\Downloads\\Lexical_Analysis\\main\\main.upl";
+        String filePath = "upl_java/main.upl";
 
         Lexer lexer = new Lexer();
         lexer.tokenize(filePath);
