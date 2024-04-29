@@ -7,10 +7,10 @@ public class Main {
 
         Lexer lexer = new Lexer();
         lexer.tokenize(filePath);
-        // lexer.printTokens();
+         lexer.printTokens();
 
-        Parser parser = new Parser(lexer.getTokensList());
-        parser.parse();
+//        Parser parser = new Parser(lexer.getTokensList());
+//        parser.parse();
     }
 
 }

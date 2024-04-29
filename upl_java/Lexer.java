@@ -5,9 +5,9 @@ import java.util.regex.*;
 import java.util.*;
 
 public class Lexer {
-    private ArrayList<Token> tokensList = new ArrayList<>();
+    private final ArrayList<Token> tokensList = new ArrayList<>();
     private boolean isInMultiLineComment = false;
-    private static String[] TOKEN_REGEX = {
+    private static final String[] TOKEN_REGEX = {
             // NOTE: Keyword higher priority
             "^begin$", "BEGIN",
             "^end$", "END",
@@ -19,12 +19,12 @@ public class Lexer {
             "^do$", "DO",
             "^while$", "WHILE",
             "^true$|^false$", "BOOLEAN CONSTANT",
-            "^[0]|[1-9][0-9]*$", "INTEGER CONSTANT",
+            "^0|[1-9][0-9]*$", "INTEGER CONSTANT",
             "^print\\b", "PRINT",
 
             // NOTE: Lower priority
             "^[a-zA-Z]+[0-9]*$", "IDENTIFIER",
-            "^[=]$", "ASSIGN",
+            "^=$", "ASSIGN",
             // "^>$|^>=$|^==$", "ROP",
             "^>$", "GREATER",
             "^>=$", "GREATER OR EQUAL",

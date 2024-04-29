@@ -11,47 +11,34 @@
 ```
 Program          -> 'begin' StatementList 'end'
 
-StatementList    -> Statement ';' StatementList
-                  | Statement ';'
+StatementList    -> Statement ';' StatementList | Statement ';'
 
-Statement        -> Declaration
-                  | Assignment
-                  | ConditionalStatement
-                  | LoopStatement
-                  | PrintStatement
+Statement        -> Declaration | Assignment | ConditionalStatement | LoopStatement | PrintStatement
 
 Declaration      -> Type Identifier | Type Identifier '=' Expression
 
-Type             -> 'int' | 'bool'
+Identifier       -> Letters Numbers
 
-Identifier       -> Letter Letter*Digit
+Letters          -> Letter | Letter Letters
+
+Numbers          -> ε | Number | Number Numbers
 
 Assignment       -> Identifier '=' Expression
 
-Expression       -> Term | Expression '+' Term | Expression ROP Term
+Expression       -> Term Expr'
+Expr'            -> + Term Expr' | ROP Term Expr' | ε
 
-Term             -> Factor
-                  | Term '*' Factor
+Term             -> Factor Term'
+Term'            -> * Factor | ε
 
-Factor           -> Identifier
-                  | Number
-                  | '(' Expression ')'
-
-Number           -> Digit+
+Factor           -> Identifier | Number | '(' Expression ')'
 
 ConditionalStatement -> 'if' Expression 'then' '{' Statement '}' | 'if' Expression 'then' '{' Statement '}' 'else' '{' Statement '}'
 
 LoopStatement    -> 'do' '{' Statement '}' while' Expression
 
 PrintStatement   -> 'print' '(' Expression ')'
-
-Letter           -> 'a' | 'b' | ... | 'z' | 'A' | 'B' | ... | 'Z'
-
-Digit            -> '0' | '1' | ... | '9'
-
-ROP              -> '>' | '>=' | '=='
 ```
-
 # 3. Xây dựng bộ phân tích từ vựng 
 ## 3.1. Phân tích từ vựng
 
