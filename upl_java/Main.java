@@ -11,6 +11,7 @@ public class Main {
         lexer.tokenize(filePath);
         lexer.printTokens();
 
+
 //        Parser parser = new Parser(lexer.getTokensList());
 //        parser.parse();
     }

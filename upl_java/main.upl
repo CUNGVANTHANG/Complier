@@ -1,5 +1,6 @@
 begin
 	if a > b then {
+	    true
 		a = b;
 		a = 1;
 	}
