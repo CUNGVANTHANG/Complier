@@ -1,4 +1,4 @@
-package main;
+package main.models;
 
 public class Token {
     private String value;

@@ -1,6 +1,7 @@
 begin
 	if a > b then {
-		a =b
+		a = b;
+		a = 1;
 	}
 end
 

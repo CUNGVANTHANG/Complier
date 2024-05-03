@@ -5,13 +5,13 @@ import java.util.*;
 public class LL1Parser {
 
     private static List<String> rules = new ArrayList<>();
-    private static Set<String> termUserdef = new HashSet<>();
+    private static Set<String> termUserdef = new LinkedHashSet<>();
     private static Map<String, List<List<String>>> diction = new LinkedHashMap<>();
     private static final Map<String, Set<String>> firsts = new LinkedHashMap<>();
     private static final Map<String, Set<String>> follows = new LinkedHashMap<>();
     private static String startSymbol;
 
-    public static Map<String, List<List<String>>> removeLeftRecursion(Map<String, List<List<String>>> rulesDict) {
+    public static void removeLeftRecursion(Map<String, List<List<String>>> rulesDict) {
         Map<String, List<List<String>>> store = new LinkedHashMap<>();
 
         for (String lhs : rulesDict.keySet()) {
@@ -34,28 +34,10 @@ public class LL1Parser {
                     lhs_ += "'";
                 }
 
-                for (int b = 0; b < betaRules.size(); b++) {
-                    List<String> betaRule = betaRules.get(b);
-
-                    // Tạo một danh sách mới và sao chép các phần tử từ betaRule
-                    List<String> newList = new ArrayList<>(betaRule);
-
-                    newList.add(lhs_);
-
-                    betaRules.set(b, newList);
-                }
+                _processRule(betaRules, lhs_);
                 rulesDict.put(lhs, betaRules);
 
-                for (int a = 0; a < alphaRules.size(); a++) {
-                    List<String> alphaRule = alphaRules.get(a);
-
-                    // Tạo một danh sách mới và sao chép các phần tử từ betaRule
-                    List<String> newList = new ArrayList<>(alphaRule);
-
-                    newList.add(lhs_);
-
-                    alphaRules.set(a, newList);
-                }
+                _processRule(alphaRules, lhs_);
                 alphaRules.add(Collections.singletonList("#"));
                 store.put(lhs_, alphaRules);
             }
@@ -65,7 +47,19 @@ public class LL1Parser {
             rulesDict.put(newLHS, store.get(newLHS));
         }
 
-        return rulesDict;
+    }
+
+    private static void _processRule(List<List<String>> alphaRules, String lhs_) {
+        for (int a = 0; a < alphaRules.size(); a++) {
+            List<String> alphaRule = alphaRules.get(a);
+
+            // Tạo một danh sách mới và sao chép các phần tử từ alphaRule
+            List<String> newList = new ArrayList<>(alphaRule);
+
+            newList.add(lhs_);
+
+            alphaRules.set(a, newList);
+        }
     }
 
     public static Map<String, List<List<String>>> leftFactoring(Map<String, List<List<String>>> rulesDict) {
@@ -146,7 +140,7 @@ public class LL1Parser {
 
     // Follow Function
     public static List<String> follow(String nt) {
-        Set<String> solset = new HashSet<>();
+        Set<String> solset = new LinkedHashSet<>();
         if (nt.equals(startSymbol)) {
             solset.add("$");
         }
@@ -194,6 +188,7 @@ public class LL1Parser {
         }
 
         System.out.println("\nRules:");
+
         for (Map.Entry<String, List<List<String>>> entry : diction.entrySet()) {
             System.out.println(entry.getKey() + " -> " + entry.getValue());
         }
@@ -213,14 +208,26 @@ public class LL1Parser {
 
         // Calculate first for each rule
         for (Map.Entry<String, List<List<String>>> entry : diction.entrySet()) {
-            Set<String> firstSet = new HashSet<>();
+            String TAG = "CALCULATE_FIRST";
+
+            System.out.println(TAG + "entry value -> " + entry.getValue());
+
+            Set<String> firstSet = new LinkedHashSet<>();
+
 
             for (List<String> sub : entry.getValue()) {
+                System.out.println(TAG + "sub: " + sub);
+
+
                 List<String> results = first(sub);
-                Set<String> res = new HashSet<>(results);
-                if (res != null) {
-                    firstSet.addAll(res);
-                }
+
+                System.out.println(TAG + "First: " + results);
+
+                Set<String> res = new LinkedHashSet<>(results);
+
+                System.out.println(TAG + "set of results: " + res);
+
+                firstSet.addAll(res);
             }
             firsts.put(entry.getKey(), firstSet);
         }
@@ -235,7 +242,7 @@ public class LL1Parser {
     public static void computeAllFollows() {
         for (String nt : diction.keySet()) {
             List<String> res = follow(nt);
-            Set<String> solset = new HashSet<>(res);
+            Set<String> solset = new LinkedHashSet<>(res);
             follows.put(nt, solset);
         }
 
@@ -424,25 +431,37 @@ public class LL1Parser {
 
 
     public static void main(String[] args) {
+        // # đại diện cho epsilon
         rules = Arrays.asList(
-                "S -> A k O",
-                "A -> A d | a B | a C",
-                "C -> c",
-                "B -> b B C | r"
+                "Program -> begin StatementList end",
+                "StatementList -> Statement ; StatementList | #",
+                "Statement -> Declaration | Assignment | ConditionalStatement | LoopStatement | PrintStatement",
+                "Declaration -> Type Identifier | Type Identifier = Expression",
+                "Assignment -> Identifier '=' Expression",
+                "Expression -> Term | Expression '+' Term | Expression ROP Term",
+                "Term -> Factor | Term '*' Factor",
+                "Factor -> Identifier | Number | ( Expression )",
+                "ConditionalStatement -> if Expression then { Statement } | if Expression then { Statement } else { Statement }",
+                "LoopStatement -> do { Statement } while Expression",
+                "PrintStatement -> print ( Expression )"
         );
 
 
-        termUserdef = new HashSet<>(
-                Arrays.asList("k", "O", "d", "a", "c", "b", "r")
+        termUserdef = new LinkedHashSet<>(
+                Arrays.asList("begin", ";", "end", "=", "+", "*", "if", "then", "{", "}",
+                        "Type", "else", "do", "while", "print", "(", ")", "Identifier", "Number", "ROP"
+                )
         );
 
         String sampleInputString = "a r k O";
 
         computeAllFirsts();
 
-        startSymbol = String.valueOf(rules.get(0).charAt(0));
+        // Lấy danh sách các khóa từ Map
+        List<String> keys = new ArrayList<>(diction.keySet());
 
-        System.out.println("Starting symbol: " + startSymbol);
+        // Lấy khóa đầu tiên
+        startSymbol = keys.get(0);
 
         computeAllFollows();
 

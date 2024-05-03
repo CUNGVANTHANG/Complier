@@ -1,9 +1,12 @@
-package main;
+package main.lexical;
+
+import main.models.Token;
 
 import java.io.*;
 import java.util.regex.*;
 import java.util.*;
 
+//Lexical analyzer v1
 public class Lexer {
     private final ArrayList<Token> tokensList = new ArrayList<>();
     private boolean isInMultiLineComment = false;
@@ -19,7 +22,7 @@ public class Lexer {
             "^do$", "DO",
             "^while$", "WHILE",
             "^true$|^false$", "BOOLEAN CONSTANT",
-            "^0|[1-9][0-9]*$", "INTEGER CONSTANT",
+            "^0|[1-9][0-9]*$", "NUMBER",
             "^print\\b", "PRINT",
 
             // NOTE: Lower priority
@@ -29,7 +32,7 @@ public class Lexer {
             "^>$", "GREATER",
             "^>=$", "GREATER OR EQUAL",
             "^==$", "EQUALS",
-            "^[;]$", "SEMICOLON",
+            "^;$", "SEMICOLON",
             "^[(]$", "L_PARENTHESES",
             "^[)]$", "R_PARENTHESES",
             "^[{]$", "L_BRACKET",
@@ -45,7 +48,7 @@ public class Lexer {
         }
         return line;
     }
-    
+
     public String removeMultiLineComment(String line) {
         int startIndex = line.indexOf("/*");
         if (startIndex != -1) {
@@ -67,13 +70,13 @@ public class Lexer {
         }
         return line;
     }
-    
+
     public void tokenize(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             int lineIndex = 1;
             while ((line = br.readLine()) != null) {
-                line= removeSingleLineComment(line);
+                line = removeSingleLineComment(line);
                 line = removeMultiLineComment(line);
                 if (!line.trim().isEmpty()) {
                     String convertedLine = convertCode(line);
@@ -82,7 +85,7 @@ public class Lexer {
                 lineIndex++;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
     }
 
@@ -109,8 +112,7 @@ public class Lexer {
     public String convertCode(String code) {
         Pattern pattern = Pattern.compile("(/\\*|\\*/|//|>=|<=|==|!=|[+\\-*/;()><{}=])");
         Matcher matcher = pattern.matcher(code);
-        String spacedCode = matcher.replaceAll(" $1 ");
-        return spacedCode;
+        return matcher.replaceAll(" $1 ");
     }
 
     public void printTokens() {
