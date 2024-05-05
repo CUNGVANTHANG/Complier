@@ -6,7 +6,8 @@ import main.models.TokenType;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
+
+import static main.shared.ErrorHandler.error;
 
 public class Lexical {
     private int line;
@@ -19,16 +20,7 @@ public class Lexical {
     Map<String, TokenType> constant = new HashMap<>();
 
 
-    static void error(int line, int pos, String msg) {
-        if (line > 0 && pos > 0) {
-            System.out.printf("%s in line %d, pos %d\n", msg, line, pos);
-        } else {
-            System.out.println(msg);
-        }
-        System.exit(1);
-    }
-
-    Lexical(String source) {
+    public Lexical(String source) {
         this.line = 1;
         this.pos = 0;
         this.position = 0;
@@ -114,7 +106,6 @@ public class Lexical {
 
         // Check if there are numbers in the middle (not at the end)
         for (int i = 0; i < content.length() - 1; i++) {
-            char c = content.charAt(i);
             if (Character.isDigit(content.charAt(i)) && Character.isAlphabetic(content.charAt(i + 1))) {
                 has_number_in_middle = true;
                 break;
@@ -179,7 +170,7 @@ public class Lexical {
                 getNextChar();
                 yield new Token(TokenType.Semicolon, "", line, pos);
             }
-         
+
             default -> identifier_or_integer(line, pos);
         };
     }
@@ -199,49 +190,18 @@ public class Lexical {
         return this.chr;
     }
 
-    void printTokens() throws IOException {
+    public void printTokens() throws IOException {
 
         Token token;
 
         try (PrintWriter writer = new PrintWriter(new FileWriter("upl_java/upl.lex"))) {
             while ((token = getToken()).tokentype != TokenType.End_of_input) {
                 System.out.println(token);
-
-                writer.println(token);  // Ghi
                 /// in ra file
-
+                writer.println(token);  // Ghi
             }
             System.out.println(token);
             writer.println(token);
-
         }
-
-    }
-
-
-    public static void main(String[] args) throws IOException {
-        if (args.length > 0) {
-            try {
-                File f = new File(args[0]);
-                _analyzeFile(f);
-            } catch (FileNotFoundException e) {
-                error(-1, -1, "Exception: " + e.getMessage());
-            }
-        } else {
-            String filePath = "upl_java/main.upl";
-            File f = new File(filePath);
-            _analyzeFile(f);
-        }
-    }
-
-
-    private static void _analyzeFile(File f) throws IOException {
-        Scanner s = new Scanner(f);
-        StringBuilder source = new StringBuilder(" ");
-        while (s.hasNext()) {
-            source.append(s.nextLine()).append("\n");
-        }
-        Lexical l = new Lexical(source.toString());
-        l.printTokens();
     }
 }

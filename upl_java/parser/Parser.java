@@ -4,6 +4,7 @@ import main.models.Node;
 import main.models.NodeType;
 import main.models.Token;
 import main.models.TokenType;
+import main.shared.ErrorHandler;
 
 import java.io.File;
 import java.util.Scanner;
@@ -13,20 +14,13 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
+import static main.shared.ErrorHandler.error;
+
 class Parser {
     private final List<Token> source;
     private Token token;
     private int position;
 
-
-    static void error(int line, int pos, String msg) {
-        if (line > 0 && pos > 0) {
-            System.out.printf("%s in line %d, pos %d\n", msg, line, pos);
-        } else {
-            System.out.println(msg);
-        }
-        System.exit(1);
-    }
 
     Parser(List<Token> source) {
         this.source = source;
@@ -52,7 +46,7 @@ class Parser {
             result = Node.make_leaf(NodeType.nd_Integer, this.token.value);
             getNextToken();
         } else {
-            error(this.token.line, this.token.pos, "Expecting a primary, found: " + this.token.tokentype);
+            ErrorHandler.error(this.token.line, this.token.pos, "Expecting a primary, found: " + this.token.tokentype);
         }
 
         while (this.token.tokentype.isBinary() && this.token.tokentype.getPrecedence() >= p) {
@@ -80,7 +74,7 @@ class Parser {
             getNextToken();
             return;
         }
-        error(this.token.line, this.token.pos, msg + ": Expecting '" + s + "', found: '" + this.token.tokentype + "'");
+        ErrorHandler.error(this.token.line, this.token.pos, msg + ": Expecting '" + s + "', found: '" + this.token.tokentype + "'");
     }
 
     Node stmt() {
@@ -155,7 +149,7 @@ class Parser {
                     expect("assign", TokenType.Semicolon); // Kiểm tra dấu chấm phẩy
                 } else {
                     // Trường hợp token không được mong đợi
-                    error(this.token.line, this.token.pos, "Expected ';' or '=' but got: " + this.token.tokentype);
+                    ErrorHandler.error(this.token.line, this.token.pos, "Expected ';' or '=' but got: " + this.token.tokentype);
                 }
             }
 
@@ -168,7 +162,7 @@ class Parser {
             }
 
             default ->
-                    error(this.token.line, this.token.pos, "Expecting start of statement, found: " + this.token.tokentype);
+                    ErrorHandler.error(this.token.line, this.token.pos, "Expecting start of statement, found: " + this.token.tokentype);
         }
 
         return t;
@@ -182,7 +176,7 @@ class Parser {
 
         // Check for "begin" keyword
         if (this.token.tokentype != TokenType.Keyword_Begin) {
-            error(this.token.line, this.token.pos, "Expected 'begin' keyword at the beginning of the program");
+            ErrorHandler.error(this.token.line, this.token.pos, "Expected 'begin' keyword at the beginning of the program");
             return null;
         }
 
@@ -198,19 +192,6 @@ class Parser {
         Node.make_leaf(NodeType.nd_End, "end");
 
         return t;
-
-
-//        // Check for "end" keyword
-//        if (this.token.tokentype != TokenType.Keyword_End) {
-//            error(this.token.line, this.token.pos, "Expected 'end' keyword at the end of the program");
-//            return null;
-//        }
-//        getNextToken();
-//
-//        // Create a root node with "begin", statement, and "end" as children
-//        return t;
-//                statement,
-//                Node.make_leaf(NodeType.nd_End, "end"));
     }
 
     void printAST(Node t) {
@@ -243,7 +224,6 @@ class Parser {
 
             str_to_tokens.put("Keyword_Begin", TokenType.Keyword_Begin);
             str_to_tokens.put("Keyword_End", TokenType.Keyword_End);
-
 
             str_to_tokens.put("End_of_input", TokenType.End_of_input);
             str_to_tokens.put("Op_multiply", TokenType.Op_multiply);
@@ -299,12 +279,9 @@ class Parser {
             Parser p = new Parser(tokens);
             p.printAST(p.parse());
         } catch (Exception e) {
-            error(-1, -1, "Exception: " + e.getMessage());
+            ErrorHandler.error(-1, -1, "Exception: " + e.getMessage());
         }
-//        if (args.length > 0) {
-//
-//        } else {
-//            error(-1, -1, "No args");
-//        }
+
+
     }
 }
