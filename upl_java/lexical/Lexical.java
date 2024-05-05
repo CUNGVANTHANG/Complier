@@ -190,17 +190,17 @@ public class Lexical {
         return this.chr;
     }
 
-    public void printTokens() throws IOException {
+    public void printTokens(String outputLexFilePath) throws IOException {
 
         Token token;
 
-        try (PrintWriter writer = new PrintWriter(new FileWriter("upl_java/upl.lex"))) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(outputLexFilePath))) {
             while ((token = getToken()).tokentype != TokenType.End_of_input) {
-                System.out.println(token);
+//                System.out.println(token);
                 /// in ra file
                 writer.println(token);  // Ghi
             }
-            System.out.println(token);
+//            System.out.println(token);
             writer.println(token);
         }
     }

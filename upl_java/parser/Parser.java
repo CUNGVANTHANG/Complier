@@ -16,7 +16,7 @@ import java.util.HashMap;
 
 import static main.shared.ErrorHandler.error;
 
-class Parser {
+public class Parser {
     private final List<Token> source;
     private Token token;
     private int position;
@@ -115,10 +115,8 @@ class Parser {
                 getNextToken();
                 expect("Print", TokenType.LeftParen);
 
-
                 e = Node.make_node(NodeType.nd_Prti, expr(0), null);
                 t = Node.make_node(NodeType.nd_Sequence, t, e);
-
 
                 expect("Print", TokenType.RightParen);
                 expect("Print", TokenType.Semicolon);
@@ -169,7 +167,7 @@ class Parser {
     }
 
 
-    Node parse() {
+    public Node parse() {
         Node t = null;
 
         getNextToken();
@@ -210,7 +208,8 @@ class Parser {
         }
     }
 
-    public static void main(String[] args) {
+
+    public static void parse(String lexFilePath) {
 
         try {
             StringBuilder value;
@@ -254,7 +253,7 @@ class Parser {
             str_to_tokens.put("False", TokenType.FalseConstant);
 
 
-            Scanner s = new Scanner(new File("upl_java/upl.lex"));
+            Scanner s = new Scanner(new File(lexFilePath));
             String source = " ";
             while (s.hasNext()) {
                 String str = s.nextLine();
