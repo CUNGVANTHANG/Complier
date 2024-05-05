@@ -30,6 +30,8 @@ ConditionalStatement -> 'if' Expression 'then' '{' Statement '}' | 'if' Expressi
 LoopStatement    -> 'do' '{' Statement '}' while' Expression
 
 PrintStatement   -> 'print' '(' Expression ')'
+
+Type             -> int | bool
 ```
 
 # 3. Xây dựng bộ phân tích từ vựng

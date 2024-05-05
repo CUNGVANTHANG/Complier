@@ -1,34 +1,32 @@
 package main.models;
 
 public class Token {
-    private String value;
-    private String type;
-    private int lineIndex;
+    public TokenType tokentype;
+    public String value;
+    public int line;
+    public int pos;
 
-    public Token(String value, String type, int lineIndex) {
+    public Token(TokenType token, String value, int line, int pos) {
+        this.tokentype = token;
         this.value = value;
-        this.type = type;
-        this.lineIndex = lineIndex;
-    }
-
-    public int getLineIndex() {
-        return lineIndex;
-    }
-
-    public void setLineIndex(int lineIndex) {
-        this.lineIndex = lineIndex;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public String getType() {
-        return type;
+        this.line = line;
+        this.pos = pos;
     }
 
     @Override
     public String toString() {
-        return "< " + value + ", '" + type + "' >";
+        String result = String.format("%5d  %5d %-15s", this.line, this.pos, this.tokentype);
+
+        switch (this.tokentype) {
+            case Integer, Keyword_bool:
+                result += String.format("  %4s", value);
+                break;
+            case Identifier:
+                result += String.format(" %s", value);
+                break;
+        }
+        return result;
     }
 }
+
+

@@ -1,7 +1,9 @@
 package main.lexical;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import main.models.Token;
+import main.models.TokenType;
+
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -16,43 +18,6 @@ public class Lexical {
     Map<String, TokenType> keywords = new HashMap<>();
     Map<String, TokenType> constant = new HashMap<>();
 
-    static class Token {
-        public TokenType tokentype;
-        public String value;
-        public int line;
-        public int pos;
-
-        Token(TokenType token, String value, int line, int pos) {
-            this.tokentype = token;
-            this.value = value;
-            this.line = line;
-            this.pos = pos;
-        }
-
-        @Override
-        public String toString() {
-            String result = String.format("%5d  %5d %-15s", this.line, this.pos, this.tokentype);
-
-            switch (this.tokentype) {
-                case Integer, Boolean:
-                    result += String.format("  %4s", value);
-                    break;
-                case Identifier:
-                    result += String.format(" %s", value);
-                    break;
-            }
-            return result;
-        }
-    }
-
-    static enum TokenType {
-        Keyword_Begin, Keyword_End,
-        End_of_input, Semicolon, Identifier, Integer, Boolean,
-        Op_greater, Op_greaterequal, Op_equal, Op_assign, Op_multiply, Op_add,
-        Keyword_if, Keyword_then, Keyword_else, Keyword_while, Keyword_print,
-        LeftParen, RightParen, LeftBrace, RightBrace, Unknow, Comma,
-        TrueConstant, FalseContant
-    }
 
     static void error(int line, int pos, String msg) {
         if (line > 0 && pos > 0) {
@@ -72,12 +37,16 @@ public class Lexical {
         this.keywords.put("if", TokenType.Keyword_if);
         this.keywords.put("else", TokenType.Keyword_else);
         this.keywords.put("print", TokenType.Keyword_print);
-        this.keywords.put("while", TokenType.Keyword_while);
         this.keywords.put("then", TokenType.Keyword_then);
         this.keywords.put("begin", TokenType.Keyword_Begin);
         this.keywords.put("end", TokenType.Keyword_End);
+        this.keywords.put("while", TokenType.Keyword_while);
+
+        this.keywords.put("bool", TokenType.Keyword_bool);
+        this.keywords.put("int", TokenType.Keyword_int);
+        this.keywords.put("do", TokenType.Keyword_do);
         this.constant.put("true", TokenType.TrueConstant);
-        this.constant.put("false", TokenType.FalseContant);
+        this.constant.put("false", TokenType.FalseConstant);
     }
 
     Token follow(TokenType ifyes, TokenType ifno, int line, int pos) {
@@ -91,42 +60,33 @@ public class Lexical {
         return new Token(ifno, "", line, pos);
     }
 
-    Token char_lit(int line, int pos) {
-        char c = getNextChar(); // skip opening quote
-        int n = (int) c;
-        if (c == '\'') {
-            error(line, pos, "empty character constant");
-        } else if (c == '\\') {
-            c = getNextChar();
-            if (c == 'n') {
-                n = 10;
-            } else {
-                error(line, pos, String.format("unknown escape sequence \\%c", c));
-            }
-        }
-        if (getNextChar() != '\'') {
-            error(line, pos, "multi-character constant");
-        }
-        getNextChar();
-        return new Token(TokenType.Integer, "" + n, line, pos);
-    }
-
     Token commentDetector(int line, int pos) {
-        if (getNextChar() != '*') {
-            return new Token(TokenType.Unknow, "", line, pos);
-        }
-        getNextChar();
-        while (true) {
-            if (this.chr == '\u0000') {
-                error(line, pos, "EOF in comment");
-            } else if (this.chr == '*') {
-                if (getNextChar() == '/') {
+        char firstChar = getNextChar();
+
+        if (firstChar == '*') {
+            // Xử lý comment nhiều dòng kiểu /* ... */
+            getNextChar(); // Di chuyển qua '*'
+            while (true) {
+                if (this.chr == '\u0000') {
+                    error(line, pos, "EOF trong comment nhiều dòng");
+                    return null; // Nếu lỗi, có thể trả về null hoặc token đặc biệt
+                } else if (this.chr == '*') {
+                    if (getNextChar() == '/') {
+                        getNextChar(); // Di chuyển qua '/'
+                        return getToken();
+                    }
+                } else {
                     getNextChar();
-                    return getToken();
                 }
-            } else {
-                getNextChar();
             }
+        } else if (firstChar == '/') {
+            // Xử lý comment một dòng kiểu //
+            while (this.chr != '\n' && this.chr != '\u0000') {
+                getNextChar(); // Bỏ qua cho đến khi gặp newline hoặc EOF
+            }
+            return getToken();
+        } else {
+            return new Token(TokenType.Unknow, "", line, pos);
         }
     }
 
@@ -135,12 +95,17 @@ public class Lexical {
         boolean has_number_in_middle = false;
 
         // Collect characters that are valid in identifiers
-        while (Character.isAlphabetic(this.chr) || Character.isDigit(this.chr) || this.chr == '_') {
+        while (Character.isAlphabetic(this.chr) || Character.isDigit(this.chr) || this.chr == '-') {
             text.append(this.chr);
             getNextChar();
         }
 
         String content = text.toString();
+
+        // If identifier contains numbers only at the end, treat it as a valid identifier
+        if (content.matches("^-?\\d+$")) {
+            return new Token(TokenType.Integer, content, line, pos);
+        }
 
         // Validate that an identifier starts with a letter
         if (content.isEmpty() || !Character.isAlphabetic(content.charAt(0))) {
@@ -160,10 +125,6 @@ public class Lexical {
             error(line, pos, String.format("Identifier has numbers in an invalid position: %s", content));
         }
 
-        // If identifier contains numbers only at the end, treat it as a valid identifier
-        if (content.chars().allMatch(Character::isDigit)) {
-            return new Token(TokenType.Integer, content, line, pos);
-        }
 
         if (this.constant.containsKey(content)) {
             return new Token(this.constant.get(content), "", line, pos);
@@ -188,7 +149,6 @@ public class Lexical {
         return switch (this.chr) {
             case '\u0000' -> new Token(TokenType.End_of_input, "", this.line, this.pos);
             case '/' -> commentDetector(line, pos);
-            case '\'' -> char_lit(line, pos);
             case '>' -> follow(TokenType.Op_greaterequal, TokenType.Op_greater, line, pos);
             case '=' -> follow(TokenType.Op_equal, TokenType.Op_assign, line, pos);
             case '{' -> {
@@ -219,10 +179,7 @@ public class Lexical {
                 getNextChar();
                 yield new Token(TokenType.Semicolon, "", line, pos);
             }
-            case ',' -> {
-                getNextChar();
-                yield new Token(TokenType.Comma, "", line, pos);
-            }
+         
             default -> identifier_or_integer(line, pos);
         };
     }
@@ -242,15 +199,27 @@ public class Lexical {
         return this.chr;
     }
 
-    void printTokens() {
-        Token t;
-        while ((t = getToken()).tokentype != TokenType.End_of_input) {
-            System.out.println(t);
+    void printTokens() throws IOException {
+
+        Token token;
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter("upl_java/upl.lex"))) {
+            while ((token = getToken()).tokentype != TokenType.End_of_input) {
+                System.out.println(token);
+
+                writer.println(token);  // Ghi
+                /// in ra file
+
+            }
+            System.out.println(token);
+            writer.println(token);
+
         }
-        System.out.println(t);
+
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
+
+    public static void main(String[] args) throws IOException {
         if (args.length > 0) {
             try {
                 File f = new File(args[0]);
@@ -265,7 +234,8 @@ public class Lexical {
         }
     }
 
-    private static void _analyzeFile(File f) throws FileNotFoundException {
+
+    private static void _analyzeFile(File f) throws IOException {
         Scanner s = new Scanner(f);
         StringBuilder source = new StringBuilder(" ");
         while (s.hasNext()) {

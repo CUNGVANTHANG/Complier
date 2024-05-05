@@ -1,8 +1,19 @@
 begin
-	if a > b then {
-	    true
-		a = b;
-		a = 1;
+	if x>a then {
+		int c=1;
+	}else{
+		y=x;
+		x=x+1;
 	}
+	print(a);
+	if x>=a then{
+	    x=x+1;
+    }
+	bool x=a==b;
+	do{
+		int b=1;
+		b=b*10;
+		a=(b+10)*b;
+	}while(a>1);
+	print(a+1);
 end
-
