@@ -1,7 +1,5 @@
 package main.parser;
 
-import main.models.Node;
-import main.models.NodeType;
 import main.models.Token;
 import main.models.TokenType;
 import main.shared.ErrorHandler;
@@ -30,18 +28,15 @@ public class Parser {
         this.token = this.source.get(this.position++);
     }
 
-    Node expr(int p) {
-        Node result = null, node;
+    void expr(int p) {
         TokenType op;
         int q;
 
         if (this.token.tokentype == TokenType.LeftParen) {
-            result = paren_expr();
+            paren_expr();
         } else if (this.token.tokentype == TokenType.Identifier) {
-            result = Node.make_leaf(NodeType.nd_Ident, this.token.value);
             getNextToken();
         } else if (this.token.tokentype == TokenType.Integer) {
-            result = Node.make_leaf(NodeType.nd_Integer, this.token.value);
             getNextToken();
         } else {
             ErrorHandler.error(this.token.line, this.token.pos, "Expecting a term, found: " + this.token.tokentype);
@@ -54,17 +49,14 @@ public class Parser {
             if (!op.isRightAssoc()) {
                 q++;
             }
-            node = expr(q);
-            result = Node.make_node(op.getNodeType(), result, node);
+            expr(q);
         }
-        return result;
     }
 
-    Node paren_expr() {
+    void paren_expr() {
         expect("paren_expr", TokenType.LeftParen);
-        Node node = expr(0);
+        expr(0);
         expect("paren_expr", TokenType.RightParen);
-        return node;
     }
 
     void expect(String msg, TokenType s) {
@@ -75,46 +67,48 @@ public class Parser {
         ErrorHandler.error(this.token.line, this.token.pos, msg + ": Expecting '" + s + "', found: '" + this.token.tokentype + "'");
     }
 
-    Node stmt() {
-        Node s = null, s2 = null, t = null, e, v;
+    void stmt() {
+//        Node s = null, s2 = null, t = null, e, v;
 
         switch (this.token.tokentype) {
             case Keyword_if -> {
                 getNextToken();
                 // expect expression
-                e = expr(0);
+                expr(0);
 
 
                 if (this.token.tokentype == TokenType.Keyword_then) {
                     getNextToken();
-                    s = stmt();
+                    stmt();
 
                     // handle thêm trường hợp có else, không có thì thoát hàm stmt()
                     if (this.token.tokentype == TokenType.Keyword_else) {
                         getNextToken();
-                        s2 = stmt();
+                        stmt();
                     }
                 }
-                t = Node.make_node(NodeType.nd_If, e, Node.make_node(NodeType.nd_If, s, s2));
+//                t = Node.make_node(NodeType.nd_If, e, Node.make_node(NodeType.nd_If, s, s2));
             }
 
             case Keyword_do -> {
                 getNextToken();
-                s = stmt();
+//                s =
+                stmt();
                 if (this.token.tokentype == TokenType.Keyword_while) {
                     getNextToken();
-                    e = paren_expr();
+//                    e =
+                    paren_expr();
                     expect("While", TokenType.Semicolon);
                 }
-                t = Node.make_node(NodeType.nd_do, null, Node.make_node(NodeType.nd_do, s, t));
+//                t = Node.make_node(NodeType.nd_do, null, Node.make_node(NodeType.nd_do, s, t));
             }
 
             case Keyword_print -> {
                 getNextToken();
                 expect("Print", TokenType.LeftParen);
-
-                e = Node.make_node(NodeType.nd_Prti, expr(0), null);
-                t = Node.make_node(NodeType.nd_Statement, t, e);
+                expr(0);
+//                e = Node.make_node(NodeType.nd_Prti, expr(0), null);
+//                t = Node.make_node(NodeType.nd_Statement, t, e);
 
                 expect("Print", TokenType.RightParen);
                 expect("Print", TokenType.Semicolon);
@@ -127,19 +121,20 @@ public class Parser {
             case Semicolon -> getNextToken();
 
             case Identifier -> {
-                v = Node.make_leaf(NodeType.nd_Ident, this.token.value);
+//                v = Node.make_leaf(NodeType.nd_Ident, this.token.value);
                 getNextToken();
 
                 // Kiểm tra xem token tiếp theo là gì
                 if (this.token.tokentype == TokenType.Semicolon) {
                     // Trường hợp chỉ khai báo, không gán giá trị
-                    t = Node.make_node(NodeType.nd_Declaration, v); // Nút khai báo
+//                    t = Node.make_node(NodeType.nd_Declaration, v); // Nút khai báo
                     getNextToken(); // Di chuyển qua dấu chấm phẩy
                 } else if (this.token.tokentype == TokenType.Op_assign) {
                     // Trường hợp gán giá trị
                     getNextToken(); // Di chuyển qua dấu gán
-                    e = expr(0); // Đánh giá biểu thức để lấy giá trị gán
-                    t = Node.make_node(NodeType.nd_Assign, v, e); // Tạo nút gán giá trị
+//                    e =
+                    expr(0); // Đánh giá biểu thức để lấy giá trị gán
+//                    t = Node.make_node(NodeType.nd_Assign, v, e); // Tạo nút gán giá trị
                     expect("assign", TokenType.Semicolon); // Kiểm tra dấu chấm phẩy
                 } else {
                     // Trường hợp token không được mong đợi
@@ -150,7 +145,8 @@ public class Parser {
             case LeftBrace -> {
                 getNextToken();
                 while (this.token.tokentype != TokenType.RightBrace && this.token.tokentype != TokenType.End_of_input) {
-                    t = Node.make_node(NodeType.nd_Statement, t, stmt());
+                    stmt();
+//                    t = Node.make_node(NodeType.nd_Statement, t, stmt());
                 }
                 expect("RBrace", TokenType.RightBrace);
             }
@@ -158,87 +154,45 @@ public class Parser {
             default ->
                     ErrorHandler.error(this.token.line, this.token.pos, "Expecting start of statement, found: " + this.token.tokentype);
         }
-
-        return t;
     }
 
-    public Node parseV2() {
-        // Tạo nút gốc "program"
-        Node programNode = Node.make_node(NodeType.nd_Program, null, null);
+
+    public void parse() {
+//        Node t = null;
 
         getNextToken();
-
-        // Kiểm tra từ khóa "begin"
-        if (this.token.tokentype != TokenType.Keyword_Begin) {
-            ErrorHandler.error(this.token.line, this.token.pos, "Expected 'begin' keyword at the beginning of the program");
-            return null;
-        }
-
-        // Tạo nút lá "begin" và thêm vào nút "program"
-        Node beginNode = Node.make_leaf(NodeType.nd_Begin, "begin");
-        programNode = Node.make_node(NodeType.nd_Program, programNode, beginNode);
-
-        // Tạo nút "stmt" cho danh sách câu lệnh
-        Node stmtNode = null;
-
-        getNextToken();
-
-        // Phân tích cú pháp danh sách câu lệnh
-        while (this.token.tokentype != TokenType.End_of_input) {
-            stmtNode = Node.make_node(NodeType.nd_Statement, stmtNode, stmt());
-            getNextToken();
-        }
-
-        // Thêm nút "stmt" vào nút "program"
-        programNode = Node.make_node(NodeType.nd_Program, programNode, stmtNode);
-
-        // Tạo nút lá "end" và thêm vào nút "program"
-        Node endNode = Node.make_leaf(NodeType.nd_End, "end");
-        programNode = Node.make_node(NodeType.nd_Program, programNode, endNode);
-
-        return programNode;
-    }
-
-    public Node parse() {
-        Node t = null;
-
-        getNextToken();
-
         // Check for "begin" keyword
         if (this.token.tokentype != TokenType.Keyword_Begin) {
             ErrorHandler.error(this.token.line, this.token.pos, "Expected 'begin' keyword at the beginning of the program");
-            return null;
+            return;
         }
-
-        t = Node.make_leaf(NodeType.nd_Begin, "begin");
-
         getNextToken();
 
         // Parse the statement
         while (this.token.tokentype != TokenType.Keyword_End) {
-            t = Node.make_node(NodeType.nd_Statement, t, stmt());
+            stmt();
         }
 
-        t = Node.make_leaf(NodeType.nd_End, "end");
+        expect("End of statement", TokenType.Keyword_End);
 
-        return t;
+        System.out.println("Accepted");
     }
 
-    void printAST(Node t) {
-        int i = 0;
-        if (t == null) {
-            System.out.println(";");
-        } else {
-            System.out.printf("%-14s", t.nt);
-            if (t.nt == NodeType.nd_Ident || t.nt == NodeType.nd_Integer) {
-                System.out.println(" " + t.value);
-            } else {
-                System.out.println();
-                printAST(t.left);
-                printAST(t.right);
-            }
-        }
-    }
+//    void printAST(Node t) {
+//        int i = 0;
+//        if (t == null) {
+//            System.out.println(";");
+//        } else {
+//            System.out.printf("%-14s", t.nt);
+//            if (t.nt == NodeType.nd_Ident || t.nt == NodeType.nd_Integer) {
+//                System.out.println(" " + t.value);
+//            } else {
+//                System.out.println();
+//                printAST(t.left);
+//                printAST(t.right);
+//            }
+//        }
+//    }
 
 
     public static void parse(String lexFilePath) {
@@ -308,7 +262,8 @@ public class Parser {
                 }
             }
             Parser p = new Parser(tokens);
-            p.printAST(p.parseV2());
+            p.parse();
+//            p.printAST(p.parseV2());
         } catch (Exception e) {
             ErrorHandler.error(-1, -1, "Exception: " + e.getMessage());
         }

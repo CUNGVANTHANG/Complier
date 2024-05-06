@@ -8,5 +8,6 @@
     2     12 RightParen     
     2     13 Op_multiply    
     2     14 Identifier      b
+    2     15 Semicolon      
     3      1 Keyword_End    
     4      1 End_of_input   
