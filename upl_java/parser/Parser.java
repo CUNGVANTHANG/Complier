@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
-import static main.shared.ErrorHandler.error;
-
 public class Parser {
     private final List<Token> source;
     private Token token;
@@ -46,7 +44,7 @@ public class Parser {
             result = Node.make_leaf(NodeType.nd_Integer, this.token.value);
             getNextToken();
         } else {
-            ErrorHandler.error(this.token.line, this.token.pos, "Expecting a primary, found: " + this.token.tokentype);
+            ErrorHandler.error(this.token.line, this.token.pos, "Expecting a term, found: " + this.token.tokentype);
         }
 
         while (this.token.tokentype.isBinary() && this.token.tokentype.getPrecedence() >= p) {
@@ -116,7 +114,7 @@ public class Parser {
                 expect("Print", TokenType.LeftParen);
 
                 e = Node.make_node(NodeType.nd_Prti, expr(0), null);
-                t = Node.make_node(NodeType.nd_Sequence, t, e);
+                t = Node.make_node(NodeType.nd_Statement, t, e);
 
                 expect("Print", TokenType.RightParen);
                 expect("Print", TokenType.Semicolon);
@@ -126,9 +124,7 @@ public class Parser {
                 stmt();
             }
 
-            case Semicolon -> {
-                getNextToken();
-            }
+            case Semicolon -> getNextToken();
 
             case Identifier -> {
                 v = Node.make_leaf(NodeType.nd_Ident, this.token.value);
@@ -154,7 +150,7 @@ public class Parser {
             case LeftBrace -> {
                 getNextToken();
                 while (this.token.tokentype != TokenType.RightBrace && this.token.tokentype != TokenType.End_of_input) {
-                    t = Node.make_node(NodeType.nd_Sequence, t, stmt());
+                    t = Node.make_node(NodeType.nd_Statement, t, stmt());
                 }
                 expect("RBrace", TokenType.RightBrace);
             }
@@ -166,6 +162,42 @@ public class Parser {
         return t;
     }
 
+    public Node parseV2() {
+        // Tạo nút gốc "program"
+        Node programNode = Node.make_node(NodeType.nd_Program, null, null);
+
+        getNextToken();
+
+        // Kiểm tra từ khóa "begin"
+        if (this.token.tokentype != TokenType.Keyword_Begin) {
+            ErrorHandler.error(this.token.line, this.token.pos, "Expected 'begin' keyword at the beginning of the program");
+            return null;
+        }
+
+        // Tạo nút lá "begin" và thêm vào nút "program"
+        Node beginNode = Node.make_leaf(NodeType.nd_Begin, "begin");
+        programNode = Node.make_node(NodeType.nd_Program, programNode, beginNode);
+
+        // Tạo nút "stmt" cho danh sách câu lệnh
+        Node stmtNode = null;
+
+        getNextToken();
+
+        // Phân tích cú pháp danh sách câu lệnh
+        while (this.token.tokentype != TokenType.End_of_input) {
+            stmtNode = Node.make_node(NodeType.nd_Statement, stmtNode, stmt());
+            getNextToken();
+        }
+
+        // Thêm nút "stmt" vào nút "program"
+        programNode = Node.make_node(NodeType.nd_Program, programNode, stmtNode);
+
+        // Tạo nút lá "end" và thêm vào nút "program"
+        Node endNode = Node.make_leaf(NodeType.nd_End, "end");
+        programNode = Node.make_node(NodeType.nd_Program, programNode, endNode);
+
+        return programNode;
+    }
 
     public Node parse() {
         Node t = null;
@@ -178,16 +210,16 @@ public class Parser {
             return null;
         }
 
-        Node.make_leaf(NodeType.nd_Begin, "begin");
+        t = Node.make_leaf(NodeType.nd_Begin, "begin");
 
         getNextToken();
 
         // Parse the statement
         while (this.token.tokentype != TokenType.Keyword_End) {
-            t = Node.make_node(NodeType.nd_Sequence, t, stmt());
+            t = Node.make_node(NodeType.nd_Statement, t, stmt());
         }
 
-        Node.make_leaf(NodeType.nd_End, "end");
+        t = Node.make_leaf(NodeType.nd_End, "end");
 
         return t;
     }
@@ -276,7 +308,7 @@ public class Parser {
                 }
             }
             Parser p = new Parser(tokens);
-            p.printAST(p.parse());
+            p.printAST(p.parseV2());
         } catch (Exception e) {
             ErrorHandler.error(-1, -1, "Exception: " + e.getMessage());
         }

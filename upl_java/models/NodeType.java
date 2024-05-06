@@ -1,9 +1,10 @@
 package main.models;
 
 public enum NodeType {
+    nd_Program("Program"),
     nd_None(""), nd_Ident("Identifier"), nd_Integer("Integer"),
     nd_int("int"),
-    nd_Sequence("Sequence"), nd_If("If"),
+    nd_Statement("Statement"), nd_If("If"),
     nd_Prti("Prti"), nd_Then("Then"), nd_Declaration("Declaration"),
     nd_Assign("Assign"), nd_Mul("Multiply"), nd_Add("Add"),
     nd_Bool("Boolean"), nd_Begin("Begin"), nd_End("End"),

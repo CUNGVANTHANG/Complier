@@ -14,8 +14,6 @@ public class Main {
     private static final String defaultOutputLexFilePath = "upl_java/upl.lex";
 
     public static void main(String[] args) throws IOException {
-
-
         if (args.length > 0) {
             try {
                 File f = new File(args[0]);
