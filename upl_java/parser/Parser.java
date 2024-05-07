@@ -59,15 +59,22 @@ public class Parser {
         expect("paren_expr", TokenType.RightParen);
     }
 
-    void expect(String msg, TokenType s) {
+    boolean expect(String msg, TokenType s) {
+
+
         if (this.token.tokentype == s) {
+            if (s == TokenType.End_of_input) {
+                return true;
+            }
+            
             getNextToken();
-            return;
+            return true;
         }
         ErrorHandler.error(this.token.line, this.token.pos, msg + ": Expecting '" + s + "', found: '" + this.token.tokentype + "'");
+        return false;
     }
 
-    void stmt() {
+    boolean stmt() {
 //        Node s = null, s2 = null, t = null, e, v;
 
         switch (this.token.tokentype) {
@@ -76,11 +83,9 @@ public class Parser {
                 // expect expression
                 expr(0);
 
-
                 if (this.token.tokentype == TokenType.Keyword_then) {
                     getNextToken();
                     stmt();
-
                     // handle thêm trường hợp có else, không có thì thoát hàm stmt()
                     if (this.token.tokentype == TokenType.Keyword_else) {
                         getNextToken();
@@ -151,9 +156,18 @@ public class Parser {
                 expect("RBrace", TokenType.RightBrace);
             }
 
+            case Keyword_Begin ->
+                    ErrorHandler.error(this.token.line, this.token.pos, "this is a keyword, can't use in statement, found: " + this.token.tokentype);
+            case Keyword_End -> {
+                getNextToken();
+                return expect("End", TokenType.End_of_input);
+            }
             default ->
                     ErrorHandler.error(this.token.line, this.token.pos, "Expecting start of statement, found: " + this.token.tokentype);
         }
+
+
+        return true;
     }
 
 
@@ -169,11 +183,15 @@ public class Parser {
         getNextToken();
 
         // Parse the statement
-        while (this.token.tokentype != TokenType.Keyword_End) {
-            stmt();
+        while (this.token.tokentype != TokenType.End_of_input) {
+            boolean isAccepted = stmt();
+
+            if (!isAccepted) {
+                break;
+            }
         }
 
-        expect("End of statement", TokenType.Keyword_End);
+//        expect("End of statement", TokenType.Keyword_End);
 
         System.out.println("Accepted");
     }
