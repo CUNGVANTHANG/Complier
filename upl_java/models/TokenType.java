@@ -1,17 +1,5 @@
 package main.models;
 
-//public enum TokenType {
-//    Keyword_Begin,
-//    Keyword_End,
-//    End_of_input,
-//    Semicolon, Identifier, Integer, Boolean,
-//    Op_greater, Op_greaterequal, Op_equal, Op_assign, Op_multiply, Op_add,
-//    Keyword_do, Keyword_while,
-//    Keyword_if, Keyword_then, Keyword_else, Keyword_print,
-//    LeftParen, RightParen, LeftBrace, RightBrace, Unknow, Comma,
-//    TrueConstant, FalseConstant
-//}
-
 public enum TokenType {
     Keyword_Begin(false, false, -1, NodeType.nd_None),
     Keyword_End(false, false, -1, NodeType.nd_None),
@@ -46,9 +34,12 @@ public enum TokenType {
     Keyword_int(false, false, -1, NodeType.nd_int),
     Keyword_bool(false, false, -1, NodeType.nd_Bool);
 
-
+    /// `precedence` tỉ lệ thuận độ ưu tiên của phép toán trong biểu thức
     private final int precedence;
-    private final boolean right_assoc; //remove
+    /// Associativity áp dụng cho các toán tử như +, -, *, /
+    /// để chỉ định nếu phép tính diễn ra từ trái sang phải hoặc từ phải sang trái.
+    private final boolean right_assoc;
+    /// xác định xem token đó có phải là toán tử nhị phân không
     private final boolean is_binary;
 
     private final NodeType node_type;
@@ -68,7 +59,7 @@ public enum TokenType {
     public boolean isBinary() {
         return this.is_binary;
     }
-    
+
     public int getPrecedence() {
         return this.precedence;
     }

@@ -17,6 +17,9 @@ public class Parser {
     private Token token;
     private int position;
 
+    String ANSI_BLUE = "\u001B[34m";
+    String ANSI_GREEN = "\u001B[32m";
+    String ANSI_RESET = "\u001B[0m";
 
     Parser(List<Token> source) {
         this.source = source;
@@ -28,7 +31,7 @@ public class Parser {
         this.token = this.source.get(this.position++);
     }
 
-    void expr(int p) {
+    void expr(int precedence) {
         TokenType op;
         int q;
 
@@ -42,13 +45,27 @@ public class Parser {
             ErrorHandler.error(this.token.line, this.token.pos, "Expecting a term, found: " + this.token.tokentype);
         }
 
-        while (this.token.tokentype.isBinary() && this.token.tokentype.getPrecedence() >= p) {
+        // While the current token represents a binary operation and has a precedence
+        // level greater than or equal to 'precedence' (the current precedence level being considered),
+        // continue processing binary operations in the expression.
+        while (this.token.tokentype.isBinary() && this.token.tokentype.getPrecedence() >= precedence) {
+            // Store the current binary operation (token type)
             op = this.token.tokentype;
+
+            // Move to the next token in the sequence
             getNextToken();
+
+            // Determine the precedence of the current binary operation
             q = op.getPrecedence();
+
+            // If the current operation is not right-associative, increase the precedence level 'q'.
+            // This ensures correct handling of left-associative operations, like addition and multiplication.
             if (!op.isRightAssoc()) {
                 q++;
             }
+
+            // Recurse with the new precedence level 'q', allowing the parser to handle binary operations
+            // with correct order and associativity.
             expr(q);
         }
     }
@@ -66,7 +83,7 @@ public class Parser {
             if (s == TokenType.End_of_input) {
                 return true;
             }
-            
+
             getNextToken();
             return true;
         }
@@ -191,9 +208,8 @@ public class Parser {
             }
         }
 
-//        expect("End of statement", TokenType.Keyword_End);
-
-        System.out.println("Accepted");
+        // if pass all condition, print accepted
+        System.out.println(ANSI_GREEN + "ACCEPTED √" + ANSI_RESET);
     }
 
 //    void printAST(Node t) {

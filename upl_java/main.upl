@@ -1,6 +1,3 @@
 begin
-
-
-    a=(b+10)*b;
-
+    a = b + 10 * b;
 end
