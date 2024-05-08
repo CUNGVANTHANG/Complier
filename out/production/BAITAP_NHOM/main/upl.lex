@@ -1,11 +1,14 @@
     1      1 Keyword_Begin  
-    2      5 Identifier      a
-    2      7 Op_assign      
-    2      9 Identifier      b
-    2     11 Op_add         
-    2     13 Integer            10
-    2     16 Op_multiply    
-    2     18 Identifier      b
-    2     19 Semicolon      
-    3      1 Keyword_End    
-    4      1 End_of_input   
+    2      2 Keyword_int    
+    2      6 Identifier      aaaaa233
+    2     14 Semicolon      
+    3      2 Keyword_int    
+    3      6 Identifier      awhile
+    3     12 Semicolon      
+    4      2 Keyword_int    
+    4      6 Identifier      aint
+    4     10 Semicolon      
+    5      2 Identifier      intA
+    5      7 Integer           122
+    6      1 Keyword_End    
+    7      1 End_of_input   

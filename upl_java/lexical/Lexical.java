@@ -78,7 +78,8 @@ public class Lexical {
             }
             return getToken();
         } else {
-            return new Token(TokenType.Unknow, "", line, pos);
+            error(line, pos, String.format("Kí tự khong phù hợp: %s", this.chr));
+            return null;
         }
     }
 

@@ -38,8 +38,6 @@ Type             -> int | bool
 
 ## 3.1. Phân tích từ vựng
 
-**a. Cách chạy chương trình Java:**
-
 **Bước 1:** Thay đổi đường dẫn file path `main.upl`
 
 <img src="https://github.com/CUNGVANTHANG/BAITAP_NHOM/assets/96326479/bf6de091-a3a6-42ec-911c-5bbf59de926f" width="800px">
@@ -161,40 +159,6 @@ end
 _Kết quả:_
 
 ![image](https://github.com/CUNGVANTHANG/BAITAP_NHOM/assets/96326479/ef82002a-5c53-41ad-a023-f5bcc4a2eff0)
-
-**b. Cách chạy chương trình JFlex:**
-
-## **Mô tả**
-
-Đây là một mã nguồn của một trình quét (scanner) cho ngôn ngữ UPL (tên viết tắt của một ngôn ngữ lập trình giả định).
-Trình quét này phân tích mã nguồn UPL và nhận diện các thành phần cú pháp khác nhau như từ khóa, số nguyên, và các ký tự
-đặc biệt.
-
-## **Cách Sử Dụng**
-
-1. **Chạy Ant để Tạo Ra Trình Quét**:
-
-   Trước tiên, bạn cần chạy Ant để sinh ra mã nguồn Java từ mã nguồn Flex. Đảm bảo bạn đã cài đặt Ant trên hệ thống của
-   mình trước khi thực hiện bước này. Để chạy Ant, mở terminal và thực hiện lệnh sau:
-
-    ```
-    ant generate
-    
-    ```
-
-   Lệnh này sẽ tạo ra các file Java từ mã nguồn Flex. Sau khi quá trình này hoàn thành, bạn sẽ thấy các file **`.java`**
-   được tạo ra trong thư mục **`src/upl/generated`**.
-
-2. **Chạy Hàm Main**:
-
-## **Kết Quả**
-
-Khi chạy trình quét trên một tệp nguồn UPL như **`example.upl`**, bạn sẽ nhận được các thông tin sau:
-
-- **Các từ khóa**: **`int`**, **`bool`**, **`if`**, **`then`**, **`else`**, **`do`**, **`while`**, **`print`**.
-- **Các token khác**: Số nguyên, các toán tử (**`=`**, **`>=`**, **`>`**, **`<=`**, **`<`**, **`==`**, **`+`**, **``**),
-  dấu chấm phẩy, dấu ngoặc đơn, dấu ngoặc nhọn, dấu bằng.
-- **Các lỗi**: Nếu có ký tự không hợp lệ trong mã nguồn UPL, chương trình sẽ xuất ra thông báo lỗi và vị trí của nó.
 
 ## 3.2. Thông báo lỗi
 
