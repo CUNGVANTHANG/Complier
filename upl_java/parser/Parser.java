@@ -77,13 +77,10 @@ public class Parser {
     }
 
     boolean expect(String msg, TokenType s) {
-
-
         if (this.token.tokentype == s) {
             if (s == TokenType.End_of_input) {
                 return true;
             }
-
             getNextToken();
             return true;
         }
