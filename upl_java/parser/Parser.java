@@ -45,9 +45,9 @@ public class Parser {
             ErrorHandler.error(this.token.line, this.token.pos, "Expecting a term, found: " + this.token.tokentype);
         }
 
-        // While the current token represents a binary operation and has a precedence
-        // level greater than or equal to 'precedence' (the current precedence level being considered),
-        // continue processing binary operations in the expression.
+        // Nếu token hiện tại đang được nhận diện phép toán nhị phân và có quyền ưu tiên
+        // mức độ ưu tiên lớn hơn hoặc bằng 'độ ưu tiên' (mức độ ưu tiên hiện tại đang được xem xét -- precendence truyền vào),
+        // sẽ tiếp tục xử lý các phép toán nhị phân trong biểu thức.
         while (this.token.tokentype.isBinary() && this.token.tokentype.getPrecedence() >= precedence) {
             // Store the current binary operation (token type)
             op = this.token.tokentype;
@@ -57,15 +57,7 @@ public class Parser {
 
             // Determine the precedence of the current binary operation
             q = op.getPrecedence();
-
-            // If the current operation is not right-associative, increase the precedence level 'q'.
-            // This ensures correct handling of left-associative operations, like addition and multiplication.
-            if (!op.isRightAssoc()) {
-                q++;
-            }
-
-            // Recurse with the new precedence level 'q', allowing the parser to handle binary operations
-            // with correct order and associativity.
+            q++;
             expr(q);
         }
     }
@@ -179,15 +171,12 @@ public class Parser {
             default ->
                     ErrorHandler.error(this.token.line, this.token.pos, "Expecting start of statement, found: " + this.token.tokentype);
         }
-
-
         return true;
     }
 
 
-    public void parse() {
+    void parse() {
 //        Node t = null;
-
         getNextToken();
         // Check for "begin" keyword
         if (this.token.tokentype != TokenType.Keyword_Begin) {
@@ -195,16 +184,10 @@ public class Parser {
             return;
         }
         getNextToken();
-
         // Parse the statement
         while (this.token.tokentype != TokenType.End_of_input) {
-            boolean isAccepted = stmt();
-
-            if (!isAccepted) {
-                break;
-            }
+            stmt();
         }
-
         // if pass all condition, print accepted
         System.out.println(ANSI_GREEN + "ACCEPTED √" + ANSI_RESET);
     }
@@ -240,8 +223,8 @@ public class Parser {
 
             str_to_tokens.put("Keyword_Begin", TokenType.Keyword_Begin);
             str_to_tokens.put("Keyword_End", TokenType.Keyword_End);
-
             str_to_tokens.put("End_of_input", TokenType.End_of_input);
+
             str_to_tokens.put("Op_multiply", TokenType.Op_multiply);
             str_to_tokens.put("Op_add", TokenType.Op_add);
             str_to_tokens.put("Op_greater", TokenType.Op_greater);
@@ -271,7 +254,6 @@ public class Parser {
 
 
             Scanner s = new Scanner(new File(lexFilePath));
-            String source = " ";
             while (s.hasNext()) {
                 String str = s.nextLine();
                 StringTokenizer st = new StringTokenizer(str);
@@ -294,7 +276,7 @@ public class Parser {
             }
             Parser p = new Parser(tokens);
             p.parse();
-//            p.printAST(p.parseV2());
+
         } catch (Exception e) {
             ErrorHandler.error(-1, -1, "Exception: " + e.getMessage());
         }

@@ -19,7 +19,6 @@ public class Lexical {
     Map<String, TokenType> keywords = new HashMap<>();
     Map<String, TokenType> constant = new HashMap<>();
 
-
     public Lexical(String source) {
         this.line = 1;
         this.pos = 0;
@@ -33,7 +32,6 @@ public class Lexical {
         this.keywords.put("begin", TokenType.Keyword_Begin);
         this.keywords.put("end", TokenType.Keyword_End);
         this.keywords.put("while", TokenType.Keyword_while);
-
         this.keywords.put("bool", TokenType.Keyword_bool);
         this.keywords.put("int", TokenType.Keyword_int);
         this.keywords.put("do", TokenType.Keyword_do);
@@ -41,7 +39,7 @@ public class Lexical {
         this.constant.put("false", TokenType.FalseConstant);
     }
 
-    Token follow(TokenType ifyes, TokenType ifno, int line, int pos) {
+    Token followOfROP(TokenType ifyes, TokenType ifno, int line, int pos) {
         if (getNextChar() == '=') {
             getNextChar();
             return new Token(ifyes, "", line, pos);
@@ -129,7 +127,6 @@ public class Lexical {
         return new Token(TokenType.Identifier, content, line, pos);
     }
 
-
     Token getToken() {
         int line, pos;
         while (Character.isWhitespace(this.chr)) {
@@ -141,8 +138,8 @@ public class Lexical {
         return switch (this.chr) {
             case '\u0000' -> new Token(TokenType.End_of_input, "", this.line, this.pos);
             case '/' -> commentDetector(line, pos);
-            case '>' -> follow(TokenType.Op_greaterequal, TokenType.Op_greater, line, pos);
-            case '=' -> follow(TokenType.Op_equal, TokenType.Op_assign, line, pos);
+            case '>' -> followOfROP(TokenType.Op_greaterequal, TokenType.Op_greater, line, pos);
+            case '=' -> followOfROP(TokenType.Op_equal, TokenType.Op_assign, line, pos);
             case '{' -> {
                 getNextChar();
                 yield new Token(TokenType.LeftBrace, "", line, pos);
@@ -192,16 +189,12 @@ public class Lexical {
     }
 
     public void printTokens(String outputLexFilePath) throws IOException {
-
         Token token;
-
         try (PrintWriter writer = new PrintWriter(new FileWriter(outputLexFilePath))) {
             while ((token = getToken()).tokentype != TokenType.End_of_input) {
-//                System.out.println(token);
                 /// in ra file
-                writer.println(token);  // Ghi
+                writer.println(token);
             }
-//            System.out.println(token);
             writer.println(token);
         }
     }
