@@ -137,23 +137,21 @@ Cách sử dụng precedence
 // Nếu token hiện tại đang được nhận diện phép toán nhị phân và có quyền ưu tiên
 // mức độ ưu tiên lớn hơn hoặc bằng 'độ ưu tiên' (mức độ ưu tiên hiện tại đang được xem xét -- precendence truyền vào),
 // sẽ tiếp tục xử lý các phép toán nhị phân trong biểu thức.
-while(this.token.tokentype.isBinary() &&this.token.tokentype.
-
-getPrecedence() >=precedence){
+while(this.token.tokentype.isBinary() &&this.token.tokentype.getPrecedence() >=precedence){
 // Store the current binary operation (token type)
-op =this.token.tokentype;
-
-// Move to the next token in the sequence
-getNextToken();
-
-// Determine the precedence of the current binary operation
-q =op.
-
-getPrecedence();
-
-q++;
-
-expr(q);
+    op =this.token.tokentype;
+    
+    // Move to the next token in the sequence
+    getNextToken();
+    
+    // Determine the precedence of the current binary operation
+    q =op.
+    
+    getPrecedence();
+    
+    q++;
+    
+    expr(q);
 }
 ```
 
