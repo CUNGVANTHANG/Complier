@@ -145,12 +145,8 @@ while(this.token.tokentype.isBinary() &&this.token.tokentype.getPrecedence() >=p
     getNextToken();
     
     // Determine the precedence of the current binary operation
-    q =op.
-    
-    getPrecedence();
-    
+    q =op.getPrecedence(); 
     q++;
-    
     expr(q);
 }
 ```
