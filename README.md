@@ -12,16 +12,16 @@
 
 Sau khi đã giảm đệ quy trái, left factoring
 
-```bash
+```
 Program          -> 'begin' StatementList 'end'
 StatementList    -> Statement ';' StatementList | ε
 Statement        -> Declaration | Assignment | ConditionalStatement | LoopStatement | PrintStatement
 Declaration      -> Type Delcartion'
 Decalration'     -> Identifier | Identifier '=' Expression
-Assignment       -> Identifier '=' Expression
-Expression       -> Term, Expression'
-Term             -> Factor, Term'
-Factor           -> Identifier | Number | '(' Expression ')'
+Assignment            -> Identifier '=' Expression
+Expression            -> Term, Expression'
+Term                  -> Factor, Term'
+Factor                -> Identifier | Number | '(' Expression ')'
 ConditionalStatement  -> 'if' ConditionalStatement'
 ConditionalStatement' -> Expression 'then' '{' Statement '}' | Expression 'then' '{' Statement '}' 'else' '{' Statement '}'
 LoopStatement    -> 'do' '{' Statement '}' while' Expression
@@ -31,7 +31,13 @@ Expression' -> '+', Term, Expression' | ROP, Term, Expression' | ε
 Term' -> '*', Factor, Term' | ε
 ```
 
-## 3. Lexical analyzer
+```
+Terminal: 
+"begin", ";", "end", "=", "+", "*", "if", "then", "{", "}",
+"int", "bool", "else", "do", "while", "print", "(", ")", "Identifier", "Number", "ROP"
+```
+
+## 4. Lexical analyzer
 
 Nhận đầu vào là file cần phân tích từ vựng, chương trình ghi các token nhận biết được ra file “upl.lex” (sẽ sử dụng để
 làm input của bộ parser)
@@ -151,7 +157,15 @@ expr(q);
 }
 ```
 
-## 5. Test cases
+## 5. Cách chạy chương trình
+Nếu không truyền đường dẫn vào thì chương trình sẽ mặc định chạy file main.upl
+
+```
+javac src/Main.java
+java src/Main file_path(optional)
+```
+
+## 6. Test cases
 
 Test case 1
 
@@ -161,7 +175,8 @@ Test case 2
 
 ![Testcase2](Testcase2.png)
 
-## 6. Kết quả đạt được
+## 7. Kết quả đạt được
 
-- Bộ lexical và parser phân tích đúng từ vựng và cú pháp theo ngữ pháp.
-- Đã in ra được vị trí lỗi, gợi ý cách sửa lỗi trong bộ Parser.
+- [x] Bộ lexical và parser phân tích đúng từ vựng và cú pháp theo ngữ pháp. 
+- [x] Đã in ra được vị trí lỗi, gợi ý cách sửa lỗi trong bộ Parser. 
+- [ ] Chưa in ra được cây phân tích cú pháp
