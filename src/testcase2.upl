@@ -1,0 +1,18 @@
+begin
+	int x = 5;
+	int y = 5;
+	/*	comments
+	cho nhiều dòng
+	*/
+
+	bool a;
+	if x>y then
+		int c=1;
+	}
+
+/*
+	do {
+		print(y);
+	} while(x == y);
+
+end
