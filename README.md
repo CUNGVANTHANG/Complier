@@ -131,7 +131,7 @@ LeftParen(false,6),
 RightParen(false,6),
 ```
 
-Cách sử dụng precedence
+precedence được sử dụng trong code như sau
 
 ```java
 // Nếu token hiện tại đang được nhận diện phép toán nhị phân và có quyền ưu tiên
